@@ -18,22 +18,23 @@ public class TetrisView extends View {
     Paint paint; //чем рисуем
     Rect rect;
     Timer timer;
-    long speed = 400L; //скорость падения кубиков
-    boolean gameOver = false; //окончание игры
+    long speed = 500L; //скорость падения кубиков
     int horizontalPlace; //позиция отрисовки фигуры
     int verticalPlace;//позиция отрисовки фигуры
     int score; //очки
     Figure figure; //текущая фигура
-
+    private boolean gameOver = false; //окончание игры
     //константы для отрисовки поля
-    final int rows = 20;
-    final int columns = 12;
-    final int size = 30;
-
+    private final int rows = 20;
+    private final int columns = 12;
+    private final int size = 30;
     int[][] field = new int[rows + 1][columns + 1]; //поле
+    //координаты для движения
+    //float startX;
+    float startY;
 
     //возможные движения
-    enum actionTypes {
+    private enum actionTypes {
         LEFT, RIGHT, ROTATE, DOWN, FASTDOWN
     }
 
@@ -50,7 +51,7 @@ public class TetrisView extends View {
         score = 0;
         //генерируем случайную фигуру
         Random random = new Random();
-        figure = new Figure(random.nextInt(8));
+        figure = new Figure(random.nextInt(7));
         //создаем задание, которое будет генерироваться каждый интервал времени
         ActitionTask task = new ActitionTask(actionTypes.DOWN);
         //запускаем таймер, который через каждый интервал времени будет опускать фигуру вниз
@@ -136,7 +137,11 @@ public class TetrisView extends View {
                         horizontalPlace = 0;
                         verticalPlace = columns / 2;
                         Random random = new Random();
-                        figure = new Figure(random.nextInt(8));
+                        figure = new Figure(random.nextInt(7));
+                        timer.cancel();
+                        timer = new Timer();
+                        ActitionTask task = new ActitionTask(actionTypes.DOWN);
+                        timer.schedule(task, 300L, speed);
                         if (!figure.checkCreate(horizontalPlace, verticalPlace, field)) {
                             gameOver = true;
                             timer.cancel();
@@ -148,8 +153,10 @@ public class TetrisView extends View {
                     break;
                 case FASTDOWN: {
                     //фигура ускоряется
+                    timer.cancel();
+                    timer = new Timer();
                     ActitionTask task = new ActitionTask(actionTypes.DOWN);
-                    timer.schedule(task, speed / 3);
+                    timer.schedule(task, 0, speed / 30);
                     break;
                 }
             }
@@ -161,6 +168,7 @@ public class TetrisView extends View {
     //метод делает апдейт поля: проверяет наличие заполненных строк и дохождение до потолка
     void updateField() {
         //последняя колонка =сумма ячеек строки
+        int countDeletedRows = 0;
         for (int i = rows - 1; i >= 0; i--) {
             field[i][columns] = 0;
             for (int j = 0; j < columns; j++) {
@@ -170,10 +178,27 @@ public class TetrisView extends View {
             if (field[i][columns] == columns) {
                 score += 100;
                 //удаляем строку
+                countDeletedRows++;
                 for (int k = i; k > 0; k--) {
                     System.arraycopy(field[k - 1], 0, field[k], 0, columns + 1);
                 }
+                i++;
             }
+        }
+        //начисляем очки по правилам
+        switch (countDeletedRows) {
+            case 1:
+                score += 100;
+                break;
+            case 2:
+                score += 300;
+                break;
+            case 3:
+                score += 700;
+                break;
+            case 4:
+                score += 1500;
+                break;
         }
         //последняя строка = сумма ячеек столбца
         for (int i = 0; i < columns; i++) {
@@ -189,22 +214,44 @@ public class TetrisView extends View {
     }
 
     //определение клика на экран
+
     public boolean onTouchEvent(MotionEvent event) {
-        if (!gameOver && event.getAction() == MotionEvent.ACTION_MOVE) {
-            ActitionTask task = new ActitionTask(actionTypes.FASTDOWN);
-            task.run();
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-            float x = event.getX();
-            float y = event.getY();
-            if ((verticalPlace + 1) * size > x) {
-                ActitionTask task = new ActitionTask(actionTypes.LEFT);
-                task.run();
+        if (!gameOver) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                startY = event.getY();
             }
-            if ((verticalPlace + 1) * size < x) {
-                ActitionTask task = new ActitionTask(actionTypes.RIGHT);
-                task.run();
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getY() - startY > size * 4) {
+                    ActitionTask task = new ActitionTask(actionTypes.FASTDOWN);
+                    task.run();
+                } else {
+                    if ((verticalPlace + figure.getSizeY()) * size > event.getX()) {
+                        ActitionTask task = new ActitionTask(actionTypes.LEFT);
+                        task.run();
+                    }
+                    if ((verticalPlace + figure.getSizeY()) * size < event.getX()) {
+                        ActitionTask task = new ActitionTask(actionTypes.RIGHT);
+                        task.run();
+                    }
+                }
             }
         }
         return true;
+    }
+
+    public int getColumns() {
+        return columns;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
     }
 }

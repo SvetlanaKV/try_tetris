@@ -12,55 +12,110 @@ public class Figure {
 
     Figure(int figureType) {
         switch (figureType) {
-            //просто квадрат-ячейка
-            case 0:
-                this.sizeX = 1;
-                this.sizeY = 1;
-                this.figureShape = new int[][]{{1}, {1}};
-                break;
             //фигура Q
-            case 1:
+            case 0:
                 this.sizeX = 2;
                 this.sizeY = 2;
                 this.figureShape = new int[][]{{1, 1}, {1, 1}};
                 break;
             //фигура Z
-            case 2:
+            case 1:
                 this.sizeX = 2;
                 this.sizeY = 3;
                 this.figureShape = new int[][]{{1, 1, 0}, {0, 1, 1}};
                 break;
             //фигура S
-            case 3:
+            case 2:
                 this.sizeX = 2;
                 this.sizeY = 3;
                 this.figureShape = new int[][]{{0, 1, 1}, {1, 1, 0}};
                 break;
             //фигура T
-            case 4:
+            case 3:
                 this.sizeX = 2;
                 this.sizeY = 3;
                 this.figureShape = new int[][]{{1, 1, 1}, {0, 1, 0}};
                 break;
             //фигура I
-            case 5:
+            case 4:
                 this.sizeX = 4;
                 this.sizeY = 1;
                 this.figureShape = new int[][]{{1}, {1}, {1}, {1}};
                 break;
             //фигура J
-            case 6:
+            case 5:
                 this.sizeX = 3;
                 this.sizeY = 2;
                 this.figureShape = new int[][]{{0, 1}, {0, 1}, {1, 1}};
                 break;
             //фигура L
-            case 7:
+            case 6:
                 this.sizeX = 3;
                 this.sizeY = 2;
                 this.figureShape = new int[][]{{1, 0}, {1, 0}, {1, 1}};
                 break;
         }
+    }
+
+    //поворот фигуры
+    public int rotate (int horizontalPlace, int verticalPlace, int[][] field, int columns, int rows,
+                       boolean gameOver) {
+        if (gameOver) {
+            return verticalPlace;
+        }
+        //создаем новую фигуру
+        int newSizeX = sizeY;
+        int newSizeY = sizeX;
+        int[][] newFigureShape = new int[newSizeX][newSizeY];
+        for (int i=0;i<newSizeX;i++) {
+            for (int j=0;j<newSizeY;j++) {
+                newFigureShape[i][j]=figureShape[newSizeY-j-1][i];
+            }
+        }
+        //если нет места поворота, то сдвигаемся влево
+        int newVerticalPlace = verticalPlace;
+        if (horizontalPlace+newSizeX>rows) {
+            return verticalPlace;
+        }
+        if (verticalPlace+newSizeY>columns) {
+            newVerticalPlace=columns-newSizeY;
+        }
+        //если повернуть можно, то задаем новые параметры фигуры
+        if (checkRotate(horizontalPlace,newVerticalPlace,field, newFigureShape, newSizeX, newSizeY)) {
+            this.figureShape = newFigureShape;
+            this.sizeX = newSizeX;
+            this.sizeY = newSizeY;
+            //если в момент поворота достигли дна, фигура считается упавшей
+            if (horizontalPlace+newSizeX==rows) {
+                for (int i=0; i<newSizeX;i++) {
+                    for (int j=0; j<newSizeY;j++) {
+                        if (newFigureShape[i][j]==1) {
+                            field[horizontalPlace + i][newVerticalPlace + j] = 1;
+                        }
+                    }
+                }
+            }
+            return newVerticalPlace;
+        }
+        return verticalPlace;
+    }
+
+    //проверка возможности поворота
+    boolean checkRotate(int horizontalPlace, int verticalPlace, int[][] field,
+                        int[][] newFigureShape, int newSizeX, int newSizeY) {
+        int max = 0;
+        for (int i = 0; i < newSizeX; i++) {
+            for (int j = 0; j < newSizeY; j++) {
+                int current = newFigureShape[i][j] + field[horizontalPlace + i][verticalPlace + j];
+                if (current > max) {
+                    max = current;
+                }
+            }
+        }
+        if (max > 1) {
+            return false;
+        } else
+            return true;
     }
 
     public int getSizeX() {
