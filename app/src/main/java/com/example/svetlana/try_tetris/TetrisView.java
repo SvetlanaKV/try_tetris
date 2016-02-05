@@ -14,23 +14,23 @@ import java.util.TimerTask;
 
 public class TetrisView extends View {
 
-    Context context;
-    Paint paint; //чем рисуем
-    Rect rect;
-    Timer timer;
-    long speed = 500L; //скорость падения кубиков
-    int horizontalPlace; //позиция отрисовки фигуры
-    int verticalPlace;//позиция отрисовки фигуры
-    int score; //очки
-    Figure figure; //текущая фигура
+    private Context context;
+    private Paint paint; //чем рисуем
+    private Rect rect;
+    private Timer timer;
+    private long speed = 500L; //скорость падения кубиков
+    private Figure figure; //текущая фигура
+    private int horizontalPlace; //позиция отрисовки фигуры
+    private int verticalPlace;//позиция отрисовки фигуры
+    private int score; //очки
     private boolean gameOver = false; //окончание игры
     //константы для отрисовки поля
     private final int rows = 20;
     private final int columns = 12;
-    private final int size = 30;
+    private final int columnsForScore = 4;
+    private int size;
     int[][] field = new int[rows + 1][columns + 1]; //поле
     //координаты для движения
-    //float startX;
     float startY;
 
     //возможные движения
@@ -43,7 +43,7 @@ public class TetrisView extends View {
         super(context);
         this.context = context;
         paint = new Paint();//создаем то, чем будем рисовать
-        rect = new Rect(0, 0, 200, 120);//создаем место, где будем рисовать
+        rect = new Rect();//создаем место, где будем рисовать
         timer = new Timer();//запускаем таймер
         //устанавливаем начальную точку
         verticalPlace = columns / 2;
@@ -60,8 +60,10 @@ public class TetrisView extends View {
 
     //метод, делающий отрисовку
     public void onDraw(Canvas canvas) {
-
         canvas.getClipBounds(rect);//определяем место где будем рисовать
+        size = rect.height() / (rows + 1) > rect.width() / (columns + columnsForScore) ?
+                rect.width() / (columns + columnsForScore) : rect.height() / (rows + 1);
+        //size=30;
         canvas.drawColor(Color.DKGRAY);//рисуем фон - темносерый
         //отрисовываем упавшие фигуры
         paint.setColor(Color.CYAN);
@@ -75,7 +77,7 @@ public class TetrisView extends View {
         }
         //выводим текущие очки
         paint.setColor(Color.GREEN);
-        paint.setTextSize(30);
+        paint.setTextSize(size);
         canvas.drawText("Score", size * (columns + 1), size, paint);
         canvas.drawText(Integer.toString(score), size * (columns + 1), size * 3, paint);
         //отрисовываем фигуру
@@ -92,8 +94,8 @@ public class TetrisView extends View {
         //если игра закончилась
         if (gameOver) {
             paint.setColor(Color.RED);
-            paint.setTextSize(40);
-            canvas.drawText("Game Over", size * 3, size * 3, paint);
+            paint.setTextSize(size * 2);
+            canvas.drawText("Game Over", size * 2, size * 3, paint);
         }
     }
 
@@ -176,7 +178,7 @@ public class TetrisView extends View {
             }
             //проверяем заполненную строку
             if (field[i][columns] == columns) {
-                score += 100;
+                //score += 100;
                 //удаляем строку
                 countDeletedRows++;
                 for (int k = i; k > 0; k--) {
@@ -251,7 +253,19 @@ public class TetrisView extends View {
         return gameOver;
     }
 
-    public void setGameOver(boolean gameOver) {
-        this.gameOver = gameOver;
+    public Figure getFigure() {
+        return figure;
+    }
+
+    public int getHorizontalPlace() {
+        return horizontalPlace;
+    }
+
+    public int getVerticalPlace() {
+        return verticalPlace;
+    }
+
+    public void setVerticalPlace(int verticalPlace) {
+        this.verticalPlace = verticalPlace;
     }
 }

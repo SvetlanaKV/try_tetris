@@ -22,10 +22,9 @@ public class TetrisActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tetrisView.verticalPlace
-                        = tetrisView.figure.rotate(tetrisView.horizontalPlace,
-                        tetrisView.verticalPlace, tetrisView.field, tetrisView.getColumns(),
-                        tetrisView.getRows(), tetrisView.isGameOver());
+                tetrisView.setVerticalPlace(tetrisView.getFigure().rotate(tetrisView.getHorizontalPlace(),
+                        tetrisView.getVerticalPlace(), tetrisView.field, tetrisView.getColumns(),
+                        tetrisView.getRows(), tetrisView.isGameOver()));
             }
         });
     }
