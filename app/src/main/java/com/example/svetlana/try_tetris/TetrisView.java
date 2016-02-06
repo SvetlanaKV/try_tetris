@@ -8,231 +8,100 @@ import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.util.Random;
+import static com.example.svetlana.try_tetris.Game.ROWS;
+import static com.example.svetlana.try_tetris.Game.COLUMNS;
+
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class TetrisView extends View {
 
-    private Context context;
-    private Paint paint; //чем рисуем
-    private Rect rect;
-    private Timer timer;
-    private long speed = 500L; //скорость падения кубиков
-    private Figure figure; //текущая фигура
-    private int horizontalPlace; //позиция отрисовки фигуры
-    private int verticalPlace;//позиция отрисовки фигуры
-    private int score; //очки
-    private boolean gameOver = false; //окончание игры
-    //константы для отрисовки поля
-    private final int rows = 20;
-    private final int columns = 12;
-    private final int columnsForScore = 4;
-    private int size;
-    int[][] field = new int[rows + 1][columns + 1]; //поле
-    //координаты для движения
-    float startY;
+    final static long SPEED = 500L; //скорость падения кубиков
 
-    //возможные движения
-    private enum actionTypes {
-        LEFT, RIGHT, ROTATE, DOWN, FASTDOWN
-    }
+    private Timer timer;
+    private Game game;//игра
+    private ScoreView scoreView;//отдельное поле для очков
+    private Paint paint;
+    private Rect rect;
+    private int size;//размер ячейки
+    private float startPoint; //начальная точка для отрисовки игрового поля
+    private float startY;//координаты для движения
 
     //конструктор
-    public TetrisView(Context context) {
+    public TetrisView(Context context, ScoreView scoreView) {
         super(context);
-        this.context = context;
+        this.scoreView = scoreView;
         paint = new Paint();//создаем то, чем будем рисовать
         rect = new Rect();//создаем место, где будем рисовать
         timer = new Timer();//запускаем таймер
-        //устанавливаем начальную точку
-        verticalPlace = columns / 2;
-        horizontalPlace = 0;
-        score = 0;
-        //генерируем случайную фигуру
-        Random random = new Random();
-        figure = new Figure(random.nextInt(7));
+        game = new Game();//создаем игру
+        game.dropFigure();//кидаем случайную фигуру
         //создаем задание, которое будет генерироваться каждый интервал времени
-        ActitionTask task = new ActitionTask(actionTypes.DOWN);
+        ActionTask task = new ActionTask(ActionTypes.DOWN, this);
         //запускаем таймер, который через каждый интервал времени будет опускать фигуру вниз
-        timer.schedule(task, 300L, speed);
+        timer.schedule(task, 300L, SPEED);
     }
 
     //метод, делающий отрисовку
     public void onDraw(Canvas canvas) {
         canvas.getClipBounds(rect);//определяем место где будем рисовать
-        size = rect.height() / (rows + 1) > rect.width() / (columns + columnsForScore) ?
-                rect.width() / (columns + columnsForScore) : rect.height() / (rows + 1);
-        //size=30;
+        size = rect.height() / (ROWS + 1) > rect.width() / COLUMNS ?
+                rect.width() / COLUMNS : rect.height() / (ROWS + 1);
         canvas.drawColor(Color.DKGRAY);//рисуем фон - темносерый
+        startPoint = (rect.width() - size * COLUMNS) / 2;
         //отрисовываем упавшие фигуры
         paint.setColor(Color.CYAN);
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                if (field[i][j] == 1) {
-                    canvas.drawRect(j * size, i * size, (j + 1) * size,
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLUMNS; j++) {
+                if (game.getField()[i][j] == 1) {
+                    canvas.drawRect(startPoint + j * size, i * size, startPoint + (j + 1) * size,
                             (i + 1) * size, paint);
                 }
             }
         }
-        //выводим текущие очки
-        paint.setColor(Color.GREEN);
-        paint.setTextSize(size);
-        canvas.drawText("Score", size * (columns + 1), size, paint);
-        canvas.drawText(Integer.toString(score), size * (columns + 1), size * 3, paint);
         //отрисовываем фигуру
-        figure.drawFigure(canvas, paint, horizontalPlace, verticalPlace, size);
+        paint.setColor(Color.BLUE);
+        for (int i = 0; i < game.getFigure().getSizeX(); i++) {
+            for (int j = 0; j < game.getFigure().getSizeY(); j++) {
+                if (game.getFigure().getFigureShape()[i][j] == 1) {
+                    canvas.drawRect(startPoint + (game.getVerticalPlace() + j) * size, (game.getHorizontalPlace() + i) * size,
+                            startPoint + (game.getVerticalPlace() + j + 1) * size, (game.getHorizontalPlace() + i + 1) * size, paint);
+                }
+            }
+        }
         //рисуем поле для игры
         paint.setColor(Color.GRAY);
         paint.setStrokeWidth(1);
-        for (int i = 0; i < rows + 1; i++) {
-            canvas.drawLine(0, i * size, size * columns, i * size, paint);
+        for (int i = 0; i < ROWS + 1; i++) {
+            canvas.drawLine(startPoint, i * size, startPoint + size * COLUMNS, i * size, paint);
         }
-        for (int i = 0; i < columns + 1; i++) {
-            canvas.drawLine(i * size, 0, i * size, size * rows, paint);
+        for (int i = 0; i < COLUMNS + 1; i++) {
+            canvas.drawLine(startPoint + i * size, 0, startPoint + i * size, size * ROWS, paint);
         }
         //если игра закончилась
-        if (gameOver) {
+        if (game.isGameOver()) {
             paint.setColor(Color.RED);
             paint.setTextSize(size * 2);
             canvas.drawText("Game Over", size * 2, size * 3, paint);
         }
     }
 
-    //Задание, которое определяет, что происходит с фигурой
-    class ActitionTask extends TimerTask {
-        actionTypes action;
-
-        public ActitionTask(actionTypes action) {
-            this.action = action;
-        }
-
-        @Override
-        public void run() {
-            switch (action) {
-                case LEFT:
-                    //двигаем фигуру налево
-                    if (verticalPlace > 0 && figure.checkLeft(horizontalPlace, verticalPlace, field)) {
-                        verticalPlace--;
-                    }
-                    break;
-                case RIGHT:
-                    //двигаем фигуру направо
-                    if (verticalPlace < columns - figure.getSizeY() && figure.checkRight(horizontalPlace, verticalPlace, field)) {
-                        verticalPlace++;
-                    }
-                    break;
-                case ROTATE:
-                    //переворачиваем фигуру
-                    break;
-                case DOWN:
-                    //фигура просто падает вниз
-                    if (horizontalPlace == (rows - figure.getSizeX()) || !figure.checkDown(horizontalPlace, verticalPlace, field)) {
-                        for (int i = 0; i < figure.getSizeX(); i++) {
-                            for (int j = 0; j < figure.getSizeY(); j++) {
-                                if (figure.getFigureShape()[i][j] == 1) {
-                                    field[horizontalPlace + i][verticalPlace + j] = 1;
-                                }
-                            }
-                        }
-                        updateField();
-                        horizontalPlace = 0;
-                        verticalPlace = columns / 2;
-                        Random random = new Random();
-                        figure = new Figure(random.nextInt(7));
-                        timer.cancel();
-                        timer = new Timer();
-                        ActitionTask task = new ActitionTask(actionTypes.DOWN);
-                        timer.schedule(task, 300L, speed);
-                        if (!figure.checkCreate(horizontalPlace, verticalPlace, field)) {
-                            gameOver = true;
-                            timer.cancel();
-                        }
-                        updateField();
-                    } else {
-                        horizontalPlace++;
-                    }
-                    break;
-                case FASTDOWN: {
-                    //фигура ускоряется
-                    timer.cancel();
-                    timer = new Timer();
-                    ActitionTask task = new ActitionTask(actionTypes.DOWN);
-                    timer.schedule(task, 0, speed / 30);
-                    break;
-                }
-            }
-            //обновляем графику
-            postInvalidate();
-        }
-    }
-
-    //метод делает апдейт поля: проверяет наличие заполненных строк и дохождение до потолка
-    void updateField() {
-        //последняя колонка =сумма ячеек строки
-        int countDeletedRows = 0;
-        for (int i = rows - 1; i >= 0; i--) {
-            field[i][columns] = 0;
-            for (int j = 0; j < columns; j++) {
-                field[i][columns] += field[i][j];
-            }
-            //проверяем заполненную строку
-            if (field[i][columns] == columns) {
-                //score += 100;
-                //удаляем строку
-                countDeletedRows++;
-                for (int k = i; k > 0; k--) {
-                    System.arraycopy(field[k - 1], 0, field[k], 0, columns + 1);
-                }
-                i++;
-            }
-        }
-        //начисляем очки по правилам
-        switch (countDeletedRows) {
-            case 1:
-                score += 100;
-                break;
-            case 2:
-                score += 300;
-                break;
-            case 3:
-                score += 700;
-                break;
-            case 4:
-                score += 1500;
-                break;
-        }
-        //последняя строка = сумма ячеек столбца
-        for (int i = 0; i < columns; i++) {
-            field[rows][i] = 0;
-            for (int j = 0; j < rows; j++) {
-                field[rows][i] += field[j][i];
-            }
-            if (field[rows][i] == rows) {
-                timer.cancel();
-                gameOver = true;
-            }
-        }
-    }
-
     //определение клика на экран
-
     public boolean onTouchEvent(MotionEvent event) {
-        if (!gameOver) {
+        if (!game.isGameOver()) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 startY = event.getY();
             }
             if (event.getAction() == MotionEvent.ACTION_UP) {
-                if (event.getY() - startY > size * 4) {
-                    ActitionTask task = new ActitionTask(actionTypes.FASTDOWN);
+                if (event.getY() - startY > size * 3) {
+                    ActionTask task = new ActionTask(ActionTypes.FASTDOWN, this);
                     task.run();
                 } else {
-                    if ((verticalPlace + figure.getSizeY()) * size > event.getX()) {
-                        ActitionTask task = new ActitionTask(actionTypes.LEFT);
+                    if ((game.getVerticalPlace()) * size + startPoint > event.getX()) {
+                        ActionTask task = new ActionTask(ActionTypes.LEFT, this);
                         task.run();
                     }
-                    if ((verticalPlace + figure.getSizeY()) * size < event.getX()) {
-                        ActitionTask task = new ActitionTask(actionTypes.RIGHT);
+                    if ((game.getVerticalPlace() + game.getFigure().getSizeY()) * size + startPoint < event.getX()) {
+                        ActionTask task = new ActionTask(ActionTypes.RIGHT, this);
                         task.run();
                     }
                 }
@@ -241,31 +110,19 @@ public class TetrisView extends View {
         return true;
     }
 
-    public int getColumns() {
-        return columns;
+    public Game getGame() {
+        return game;
     }
 
-    public int getRows() {
-        return rows;
+    public ScoreView getScoreView() {
+        return scoreView;
     }
 
-    public boolean isGameOver() {
-        return gameOver;
+    public Timer getTimer() {
+        return timer;
     }
 
-    public Figure getFigure() {
-        return figure;
-    }
-
-    public int getHorizontalPlace() {
-        return horizontalPlace;
-    }
-
-    public int getVerticalPlace() {
-        return verticalPlace;
-    }
-
-    public void setVerticalPlace(int verticalPlace) {
-        this.verticalPlace = verticalPlace;
+    public void setTimer(Timer timer) {
+        this.timer = timer;
     }
 }

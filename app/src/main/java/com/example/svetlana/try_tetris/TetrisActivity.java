@@ -7,24 +7,29 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 
 public class TetrisActivity extends Activity {
+
     TetrisView tetrisView;
-    FrameLayout frameLayout;
-    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tetrisView = new TetrisView(this);
         setContentView(R.layout.tetris_activity);
-        frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
+        //выводим поле для очков
+        ScoreView scoreView = new ScoreView(this);
+        FrameLayout scoreLayout = (FrameLayout) findViewById(R.id.scoreLayout);
+        scoreLayout.addView(scoreView);
+        //выводим поле для игры в тетрис
+        tetrisView = new TetrisView(this, scoreView);
+        FrameLayout frameLayout = (FrameLayout) findViewById(R.id.frameLayout);
         frameLayout.addView(tetrisView);
-        button = (Button) findViewById(R.id.rotate_button);
+        //назначаем функцию на кнопку
+        Button button = (Button) findViewById(R.id.rotate_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tetrisView.setVerticalPlace(tetrisView.getFigure().rotate(tetrisView.getHorizontalPlace(),
-                        tetrisView.getVerticalPlace(), tetrisView.field, tetrisView.getColumns(),
-                        tetrisView.getRows(), tetrisView.isGameOver()));
+                tetrisView.getGame().setVerticalPlace(tetrisView.getGame().getFigure().
+                        rotate(tetrisView.getGame().getHorizontalPlace(), tetrisView.getGame().getVerticalPlace(),
+                                tetrisView.getGame().getField(), tetrisView.getGame().isGameOver()));
             }
         });
     }

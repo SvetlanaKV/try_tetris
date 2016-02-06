@@ -12,17 +12,33 @@
         android:background="#444444">
 
         <FrameLayout android:id="@+id/frameLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
-            android:layout_gravity="center"
-            android:layout_column="0" />
+            android:layout_column="0"
+            android:layout_weight="80"
+            android:background="#444444" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_column="1"
+            android:layout_weight="20"
+            android:background="#444444">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/scoreLayout"
+                android:background="#444444"></FrameLayout>
+        </LinearLayout>
 
     </TableRow>
 
     <TableRow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_weight="5"
         android:background="#444444">
 
@@ -31,9 +47,16 @@
             android:layout_height="wrap_content"
             android:text="Rotate"
             android:layout_column="0"
-            android:width="100dp"
             android:height="70dp"
-            android:foregroundGravity="top" />
+            android:layout_weight="80"
+            android:maxWidth="70dp"
+            android:layout_gravity="center" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="20"
+            android:background="#444444"></FrameLayout>
 
     </TableRow>
 
