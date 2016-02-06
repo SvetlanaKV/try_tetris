@@ -30,6 +30,7 @@ public class TetrisActivity extends Activity {
                 tetrisView.getGame().setVerticalPlace(tetrisView.getGame().getFigure().
                         rotate(tetrisView.getGame().getHorizontalPlace(), tetrisView.getGame().getVerticalPlace(),
                                 tetrisView.getGame().getField(), tetrisView.getGame().isGameOver()));
+                tetrisView.postInvalidate();
             }
         });
     }
