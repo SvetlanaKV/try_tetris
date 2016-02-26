@@ -12,8 +12,8 @@ public class TetrisActivity extends Activity {
     private TetrisView tetrisView;
     private SavedGame savedGame;
     private Button restartButton;
-    private Button playButton;
-    private Button pauseButton;
+    private Button playPauseButton;
+    private Button rotateButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,25 +37,27 @@ public class TetrisActivity extends Activity {
         mainLayout.setOnTouchListener(new OnSwipeTouchListener(TetrisActivity.this, tetrisView));
         //задаем кнопки
         restartButton = (Button) findViewById(R.id.restart_button);
-        pauseButton = (Button) findViewById(R.id.pause_button);
-        pauseButton.setEnabled(false);
-        playButton = (Button) findViewById(R.id.play_button);
+        playPauseButton = (Button) findViewById(R.id.play_pause_button);
+        rotateButton = (Button) findViewById(R.id.rotate_button);
         //назначаем действия на кнопки
-        pauseButton.setOnClickListener(new View.OnClickListener() {
+        rotateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tetrisView.getGame().setGameOn(false);
-                tetrisView.getTimer().cancel();
-                pauseButton.setEnabled(false);
-                playButton.setEnabled(true);
+                ActionTask task = new ActionTask(ActionTypes.UP, tetrisView);
+                task.run();
             }
         });
-        playButton.setOnClickListener(new View.OnClickListener() {
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tetrisView.playGame();
-                pauseButton.setEnabled(true);
-                playButton.setEnabled(false);
+                if (tetrisView.getGame().isGameOn()) {
+                    tetrisView.getGame().setGameOn(false);
+                    tetrisView.getTimer().cancel();
+                    playPauseButton.setText("Play");
+                } else {
+                    tetrisView.playGame();
+                    playPauseButton.setText("Pause");
+                }
             }
         });
         restartButton.setOnClickListener(new View.OnClickListener() {
@@ -63,8 +65,7 @@ public class TetrisActivity extends Activity {
             public void onClick(View v) {
                 tetrisView.getGame().setGameOver(true);
                 tetrisView.playGame();
-                pauseButton.setEnabled(true);
-                playButton.setEnabled(false);
+                playPauseButton.setText("Pause");
             }
         });
     }

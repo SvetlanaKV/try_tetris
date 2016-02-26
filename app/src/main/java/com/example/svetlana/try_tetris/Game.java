@@ -10,17 +10,23 @@ public class Game implements Serializable {
     final static int ROWS = 20;
     final static int COLUMNS = 10;
 
+    private long speed; //скорость падения кубиков
     private int[][] field = new int[ROWS + 1][COLUMNS + 1]; //игоровое поле
     private int verticalPlace = COLUMNS / 2;//текущее положение
     private int horizontalPlace = 0;//текущее положение
     private Figure figure; //текущая активная фигура
     private Figure nextFigure; //будущая фигура
     private int score; //очки
+    private int scoreToLevel;
+    private int level;
     private boolean gameOn = false; //признак действия игры
     private boolean gameOver = false; //окончание игры
 
     Game() {
         Random random = new Random();
+        scoreToLevel = 0;
+        speed = 500L;
+        level = 1;
         nextFigure = new Figure(random.nextInt(7));
     }
 
@@ -68,16 +74,27 @@ public class Game implements Serializable {
         switch (countDeletedRows) {
             case 1:
                 score += 100;
+                scoreToLevel += 100;
                 break;
             case 2:
                 score += 300;
+                scoreToLevel += 300;
                 break;
             case 3:
                 score += 700;
+                scoreToLevel += 700;
                 break;
             case 4:
                 score += 1500;
+                scoreToLevel += 1500;
                 break;
+        }
+        if (scoreToLevel >= 3000) {
+            if (speed > 50) {
+                speed -= 50L;
+            }
+            level++;
+            scoreToLevel -= 3000;
         }
         //последняя строка = сумма ячеек столбца
         for (int i = 0; i < COLUMNS; i++) {
@@ -187,5 +204,11 @@ public class Game implements Serializable {
         return gameOn;
     }
 
+    public long getSpeed() {
+        return speed;
+    }
 
+    public int getLevel() {
+        return level;
+    }
 }

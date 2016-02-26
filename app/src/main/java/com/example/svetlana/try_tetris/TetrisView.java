@@ -14,8 +14,6 @@ import java.util.Timer;
 
 public class TetrisView extends View {
 
-    final static long SPEED = 500L; //скорость падения кубиков
-
     private Timer timer;
     private Game game;//игра
     private ScoreView scoreView;//отдельное поле для очков
@@ -28,11 +26,12 @@ public class TetrisView extends View {
         super(context);
         this.scoreView = scoreView;
         this.scoreView.setScore(game.getScore());
+        this.scoreView.setLevel(game.getLevel());
         this.nextFigureView = nextFigureView;
         paint = new Paint();//создаем то, чем будем рисовать
         rect = new Rect();//создаем место, где будем рисовать
         this.game = game;
-        this.timer = new Timer ();
+        this.timer = new Timer();
         nextFigureView.setNextFigure(game.getNextFigure()); //отображаем будущую фигуру
     }
 
@@ -52,7 +51,7 @@ public class TetrisView extends View {
             timer = new Timer();//запускаем таймер
             //создаем задание, которое будет генерироваться каждый интервал времени
             ActionTask task = new ActionTask(ActionTypes.DOWN, this);
-            timer.schedule(task, 300L, SPEED);
+            timer.schedule(task, 300L, game.getSpeed());
         }
 
     }

@@ -11,6 +11,7 @@ import android.view.View;
 public class ScoreView extends View {
 
     private int score;
+    private int level;
     private Record highScore;
     private Paint paint;
     private Rect rect;
@@ -32,6 +33,8 @@ public class ScoreView extends View {
         canvas.drawText(Integer.toString(highScore.getRecord()), 0, size * 3, paint);
         canvas.drawText("Score", 0, size * 5, paint);
         canvas.drawText(Integer.toString(score), 0, size * 6, paint);
+        canvas.drawText("Level", 0, size * 8, paint);
+        canvas.drawText(Integer.toString(level), 0, size * 9, paint);
     }
 
     public void setScore(int score) {
@@ -40,5 +43,9 @@ public class ScoreView extends View {
 
     public Record getHighScore() {
         return highScore;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 }

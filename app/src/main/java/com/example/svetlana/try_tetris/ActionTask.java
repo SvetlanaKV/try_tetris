@@ -5,7 +5,6 @@ import java.util.TimerTask;
 
 import static com.example.svetlana.try_tetris.Game.COLUMNS;
 import static com.example.svetlana.try_tetris.Game.ROWS;
-import static com.example.svetlana.try_tetris.TetrisView.SPEED;
 
 //Задание, которое определяет, что происходит с фигурой
 public class ActionTask extends TimerTask {
@@ -39,13 +38,6 @@ public class ActionTask extends TimerTask {
                 //фигура просто падает вниз
                 if (game.getHorizontalPlace() == (ROWS - game.getFigure().getSizeX()) || !game.checkDown()) {
                     game.rememberFallenFigure(game.getFigure());
-                    //обновляем очки
-                    int score = game.getScore();
-                    tetrisView.getScoreView().setScore(score);
-                    if (score > tetrisView.getScoreView().getHighScore().getRecord()) {
-                        tetrisView.getScoreView().getHighScore().rememberRecord(score);
-                    }
-                    tetrisView.getScoreView().postInvalidate();
                     //генерируем новую фигуру
                     game.dropFigure();
                     //показываем будущую фигуру
@@ -55,12 +47,20 @@ public class ActionTask extends TimerTask {
                     tetrisView.getTimer().cancel();
                     tetrisView.setTimer(new Timer());
                     ActionTask task = new ActionTask(ActionTypes.DOWN, tetrisView);
-                    tetrisView.getTimer().schedule(task, 300L, SPEED);
+                    tetrisView.getTimer().schedule(task, 300L, game.getSpeed());
+                    game.updateField();
+                    //обновляем очки
+                    int score = game.getScore();
+                    tetrisView.getScoreView().setScore(score);
+                    if (score > tetrisView.getScoreView().getHighScore().getRecord()) {
+                        tetrisView.getScoreView().getHighScore().rememberRecord(score);
+                    }
+                    tetrisView.getScoreView().setLevel(game.getLevel());
+                    tetrisView.getScoreView().postInvalidate();
                     if (!game.checkCreate()) {
                         game.setGameOver(true);
                         tetrisView.getTimer().cancel();
                     }
-                    game.updateField();
                 } else {
                     game.setHorizontalPlace(game.getHorizontalPlace() + 1);
                 }
@@ -70,7 +70,7 @@ public class ActionTask extends TimerTask {
                 tetrisView.getTimer().cancel();
                 tetrisView.setTimer(new Timer());
                 ActionTask task = new ActionTask(ActionTypes.DOWN, tetrisView);
-                tetrisView.getTimer().schedule(task, 0, SPEED / 30);
+                tetrisView.getTimer().schedule(task, 0, game.getSpeed() / 30);
                 game.updateField();
                 break;
             case UP:
