@@ -7,19 +7,19 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.svetlana.try_tetris.MainActivity">
+    tools:context="com.example.svetlana.try_tetris.MainActivity"
+    android:background="#444444">
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start"
+        android:text="Go To Game!"
         android:id="@+id/start_button"
-        android:layout_marginTop="155dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textColor="#111fe8"
+        android:textColor="@android:color/white"
         android:minHeight="100dp"
         android:minWidth="200dp"
-        android:background="#d7f5fa"
-        android:textSize="30dp" />
+        android:background="#3a52de"
+        android:textSize="25dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

@@ -40,9 +40,18 @@ public class ActionTask extends TimerTask {
                 if (game.getHorizontalPlace() == (ROWS - game.getFigure().getSizeX()) || !game.checkDown()) {
                     game.rememberFallenFigure(game.getFigure());
                     //обновляем очки
-                    tetrisView.getScoreView().setScore(game.getScore());
+                    int score = game.getScore();
+                    tetrisView.getScoreView().setScore(score);
+                    if (score > tetrisView.getScoreView().getHighScore().getRecord()) {
+                        tetrisView.getScoreView().getHighScore().rememberRecord(score);
+                    }
                     tetrisView.getScoreView().postInvalidate();
+                    //генерируем новую фигуру
                     game.dropFigure();
+                    //показываем будущую фигуру
+                    tetrisView.getNextFigureView().setNextFigure(game.getNextFigure());
+                    tetrisView.getNextFigureView().postInvalidate();
+                    //запускаем таймер
                     tetrisView.getTimer().cancel();
                     tetrisView.setTimer(new Timer());
                     ActionTask task = new ActionTask(ActionTypes.DOWN, tetrisView);
@@ -56,14 +65,20 @@ public class ActionTask extends TimerTask {
                     game.setHorizontalPlace(game.getHorizontalPlace() + 1);
                 }
                 break;
-            case FASTDOWN: {
+            case FASTDOWN:
                 //фигура ускоряется
                 tetrisView.getTimer().cancel();
                 tetrisView.setTimer(new Timer());
                 ActionTask task = new ActionTask(ActionTypes.DOWN, tetrisView);
                 tetrisView.getTimer().schedule(task, 0, SPEED / 30);
+                game.updateField();
                 break;
-            }
+            case UP:
+                //фигура переворачивается
+                tetrisView.getGame().setVerticalPlace(tetrisView.getGame().getFigure().
+                        rotate(tetrisView.getGame().getHorizontalPlace(), tetrisView.getGame().getVerticalPlace(),
+                                tetrisView.getGame().getField(), tetrisView.getGame().isGameOver(), tetrisView.getGame().isGameOn()));
+                break;
         }
         //обновляем графику
         tetrisView.postInvalidate();

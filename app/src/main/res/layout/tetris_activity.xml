@@ -3,7 +3,8 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:weightSum="100"
-    android:backgroundTint="#444444">
+    android:backgroundTint="#444444"
+    android:id="@+id/mainLayout">
 
     <TableRow
         android:layout_width="match_parent"
@@ -11,27 +12,42 @@
         android:layout_weight="95"
         android:background="#444444">
 
-        <FrameLayout android:id="@+id/frameLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_column="0"
-            android:layout_weight="80"
-            android:background="#444444" />
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_column="0"
+            android:layout_weight="5">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/nextFigureLayout"></FrameLayout>
+
+        </LinearLayout>
+
+        <FrameLayout android:id="@+id/frameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
             android:layout_column="1"
-            android:layout_weight="20"
-            android:background="#444444">
+            android:layout_weight="92"
+            android:background="#444444" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_column="2"
+            android:layout_weight="3"
+            android:background="#444444"
+            android:orientation="vertical">
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/scoreLayout"
                 android:background="#444444"></FrameLayout>
+
         </LinearLayout>
 
     </TableRow>
@@ -42,21 +58,48 @@
         android:layout_weight="5"
         android:background="#444444">
 
-        <Button android:id="@+id/rotate_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rotate"
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_column="0"
+            android:layout_weight="5">
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Play"
+                android:id="@+id/play_button"
+                android:layout_column="0"
+                android:layout_weight="20"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+        <Button android:id="@+id/restart_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Restart"
+            android:layout_column="1"
             android:height="70dp"
-            android:layout_weight="80"
+            android:layout_weight="91"
             android:maxWidth="70dp"
             android:layout_gravity="center" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="20"
-            android:background="#444444"></FrameLayout>
+            android:layout_weight="4"
+            android:layout_column="2">
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Pause"
+                android:id="@+id/pause_button"
+                android:layout_weight="20"
+                android:layout_gravity="center" />
+        </FrameLayout>
 
     </TableRow>
 

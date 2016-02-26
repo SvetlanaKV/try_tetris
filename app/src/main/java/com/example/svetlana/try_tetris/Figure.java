@@ -1,10 +1,15 @@
 package com.example.svetlana.try_tetris;
 
+import java.io.Serializable;
+
 import static com.example.svetlana.try_tetris.Game.ROWS;
 import static com.example.svetlana.try_tetris.Game.COLUMNS;
 
-public class Figure {
+public class Figure implements Serializable {
 
+    //константы максимального размера фигуры при сбросе
+    final static int MAX_X = 4;
+    final static int MAX_Y = 3;
     private int sizeX;
     private int sizeY;
     private int[][] figureShape;
@@ -69,8 +74,8 @@ public class Figure {
     }
 
     //поворот фигуры
-    public int rotate(int horizontalPlace, int verticalPlace, int[][] field, boolean gameOver) {
-        if (gameOver) {
+    public int rotate(int horizontalPlace, int verticalPlace, int[][] field, boolean gameOver, boolean gameOn) {
+        if (gameOver || !gameOn) {
             return verticalPlace;
         }
         //создаем новую фигуру

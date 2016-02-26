@@ -1,25 +1,34 @@
 package com.example.svetlana.try_tetris;
 
+import java.io.Serializable;
 import java.util.Random;
 
 //класс, описывающий состояние игры
-public class Game {
+public class Game implements Serializable {
 
     //константы для поля
     final static int ROWS = 20;
-    final static int COLUMNS = 12;
+    final static int COLUMNS = 10;
 
     private int[][] field = new int[ROWS + 1][COLUMNS + 1]; //игоровое поле
     private int verticalPlace = COLUMNS / 2;//текущее положение
     private int horizontalPlace = 0;//текущее положение
     private Figure figure; //текущая активная фигура
+    private Figure nextFigure; //будущая фигура
     private int score; //очки
+    private boolean gameOn = false; //признак действия игры
     private boolean gameOver = false; //окончание игры
+
+    Game() {
+        Random random = new Random();
+        nextFigure = new Figure(random.nextInt(7));
+    }
 
     //метод выброса новой фигуры
     void dropFigure() {
+        figure = nextFigure;
         Random random = new Random();
-        figure = new Figure(random.nextInt(7));
+        nextFigure = new Figure(random.nextInt(7));
         horizontalPlace = 0;
         verticalPlace = COLUMNS / 2;
     }
@@ -154,6 +163,10 @@ public class Game {
         return figure;
     }
 
+    public Figure getNextFigure() {
+        return nextFigure;
+    }
+
     public void setVerticalPlace(int verticalPlace) {
         this.verticalPlace = verticalPlace;
     }
@@ -165,4 +178,14 @@ public class Game {
     public int[][] getField() {
         return field;
     }
+
+    public void setGameOn(boolean gameOn) {
+        this.gameOn = gameOn;
+    }
+
+    public boolean isGameOn() {
+        return gameOn;
+    }
+
+
 }
