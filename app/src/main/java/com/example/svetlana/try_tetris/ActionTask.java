@@ -51,9 +51,10 @@ public class ActionTask extends TimerTask {
                     game.updateField();
                     //обновляем очки
                     int score = game.getScore();
+                    int level = game.getLevel();
                     tetrisView.getScoreView().setScore(score);
-                    if (score > tetrisView.getScoreView().getHighScore().getRecord()) {
-                        tetrisView.getScoreView().getHighScore().rememberRecord(score);
+                    if (score > tetrisView.getScoreView().getHighScore().getRecordScore()) {
+                        tetrisView.getScoreView().getHighScore().rememberRecord(score, level);
                     }
                     tetrisView.getScoreView().setLevel(game.getLevel());
                     tetrisView.getScoreView().postInvalidate();

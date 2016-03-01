@@ -11,9 +11,7 @@ public class TetrisActivity extends Activity {
 
     private TetrisView tetrisView;
     private SavedGame savedGame;
-    private Button restartButton;
     private Button playPauseButton;
-    private Button rotateButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +34,9 @@ public class TetrisActivity extends Activity {
         TableLayout mainLayout = (TableLayout) findViewById(R.id.mainLayout);
         mainLayout.setOnTouchListener(new OnSwipeTouchListener(TetrisActivity.this, tetrisView));
         //задаем кнопки
-        restartButton = (Button) findViewById(R.id.restart_button);
+        Button restartButton = (Button) findViewById(R.id.restart_button);
         playPauseButton = (Button) findViewById(R.id.play_pause_button);
-        rotateButton = (Button) findViewById(R.id.rotate_button);
+        Button rotateButton = (Button) findViewById(R.id.rotate_button);
         //назначаем действия на кнопки
         rotateButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -43,6 +43,7 @@ public class TetrisView extends View {
             nextFigureView.setNextFigure(game.getNextFigure()); //отображаем будущую фигуру
             nextFigureView.postInvalidate();
             scoreView.setScore(0);
+            scoreView.setLevel(1);
             scoreView.postInvalidate();
         }
         if (!game.isGameOn()) {

@@ -30,7 +30,7 @@ public class ScoreView extends View {
         paint.setTextSize(size);
         canvas.drawText("High", 0, size, paint);
         canvas.drawText("Score", 0, size * 2, paint);
-        canvas.drawText(Integer.toString(highScore.getRecord()), 0, size * 3, paint);
+        canvas.drawText(Integer.toString(highScore.getRecordScore()), 0, size * 3, paint);
         canvas.drawText("Score", 0, size * 5, paint);
         canvas.drawText(Integer.toString(score), 0, size * 6, paint);
         canvas.drawText("Level", 0, size * 8, paint);

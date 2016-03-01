@@ -89,12 +89,10 @@ public class Game implements Serializable {
                 scoreToLevel += 1500;
                 break;
         }
-        if (scoreToLevel >= 3000) {
-            if (speed > 50) {
-                speed -= 50L;
-            }
+        if (scoreToLevel >= 1500) {
+            speed = Math.round(650 * Math.pow(level, 1 / 10) / Math.log(level + 2));
             level++;
-            scoreToLevel -= 3000;
+            scoreToLevel -= 1500;
         }
         //последняя строка = сумма ячеек столбца
         for (int i = 0; i < COLUMNS; i++) {
