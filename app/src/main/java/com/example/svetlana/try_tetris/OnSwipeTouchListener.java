@@ -31,23 +31,9 @@ public class OnSwipeTouchListener implements OnTouchListener {
 
         @Override
         public boolean onDown(MotionEvent event) {
-            /*
-            //более быстрое управление, если реагировать на down, но тогда свайпы вверх/вниз будут реагировать
-            //только если сделать их на уровне фигуры
-            if (tetrisView.getGame().isGameOn() && !tetrisView.getGame().isGameOver()) {
-                if (event.getX() < tetrisView.getFigureStart()) {
-                    onLeft();
-                    return false;
-                } else if (event.getX() > tetrisView.getFigureFinish()) {
-                    onRight();
-                    return false;
-                }
-            }
-            */
             return true;
         }
 
-        //точечное нажатие на экран (работает медленнее, если убирать из down
         @Override
         public boolean onSingleTapUp(MotionEvent event) {
             if (tetrisView.getGame().isGameOn() && !tetrisView.getGame().isGameOver()) {
