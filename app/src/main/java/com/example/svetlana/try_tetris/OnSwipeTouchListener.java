@@ -30,7 +30,33 @@ public class OnSwipeTouchListener implements OnTouchListener {
         private static final int SWIPE_VELOCITY_THRESHOLD = 50;
 
         @Override
-        public boolean onDown(MotionEvent e) {
+        public boolean onDown(MotionEvent event) {
+            /*
+            //более быстрое управление, если реагировать на down, но тогда свайпы вверх/вниз будут реагировать
+            //только если сделать их на уровне фигуры
+            if (tetrisView.getGame().isGameOn() && !tetrisView.getGame().isGameOver()) {
+                if (event.getX() < tetrisView.getFigureStart()) {
+                    onLeft();
+                    return false;
+                } else if (event.getX() > tetrisView.getFigureFinish()) {
+                    onRight();
+                    return false;
+                }
+            }
+            */
+            return true;
+        }
+
+        //точечное нажатие на экран (работает медленнее, если убирать из down
+        @Override
+        public boolean onSingleTapUp(MotionEvent event) {
+            if (tetrisView.getGame().isGameOn() && !tetrisView.getGame().isGameOver()) {
+                if (event.getX() < tetrisView.getFigureStart()) {
+                    onLeft();
+                } else if (event.getX() > tetrisView.getFigureFinish()) {
+                    onRight();
+                }
+            }
             return true;
         }
 
@@ -44,9 +70,9 @@ public class OnSwipeTouchListener implements OnTouchListener {
                     if (Math.abs(diffX) > Math.abs(diffY)) {
                         if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                             if (diffX > 0) {
-                                onSwipeRight();
+                                onRight();
                             } else {
-                                onSwipeLeft();
+                                onLeft();
                             }
                         }
                         result = true;
@@ -67,12 +93,12 @@ public class OnSwipeTouchListener implements OnTouchListener {
         }
     }
 
-    public void onSwipeRight() {
+    public void onRight() {
         ActionTask task = new ActionTask(ActionTypes.RIGHT, tetrisView);
         task.run();
     }
 
-    public void onSwipeLeft() {
+    public void onLeft() {
         ActionTask task = new ActionTask(ActionTypes.LEFT, tetrisView);
         task.run();
     }

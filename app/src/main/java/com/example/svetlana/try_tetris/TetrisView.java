@@ -20,6 +20,8 @@ public class TetrisView extends View {
     private NextFigureView nextFigureView;//отдельное поле для отображения следующей фигуры
     private Paint paint;
     private Rect rect;
+    private int size;
+    private float startPoint;
 
     //конструктор
     public TetrisView(Context context, ScoreView scoreView, NextFigureView nextFigureView, Game game) {
@@ -60,10 +62,10 @@ public class TetrisView extends View {
     //метод, делающий отрисовку
     public void onDraw(Canvas canvas) {
         canvas.getClipBounds(rect);//определяем место где будем рисовать
-        int size = rect.height() / (ROWS + 1) > rect.width() / COLUMNS ?
+        size = rect.height() / (ROWS + 1) > rect.width() / COLUMNS ?
                 rect.width() / COLUMNS : rect.height() / (ROWS + 1);
         canvas.drawColor(Color.DKGRAY);//рисуем фон - темносерый
-        float startPoint = (rect.width() - size * COLUMNS) / 2;
+        startPoint = (rect.width() - size * COLUMNS) / 2;
         //отрисовываем упавшие фигуры
         paint.setColor(Color.CYAN);
         for (int i = 0; i < ROWS; i++) {
@@ -119,5 +121,17 @@ public class TetrisView extends View {
 
     public void setTimer(Timer timer) {
         this.timer = timer;
+    }
+
+    //начало фигуры относительно всего экрана
+    public float getFigureStart() {
+        return startPoint + game.getVerticalPlace() * size + rect.width() / 4;
+        //последнее слагаемое это добавление размера вью под следующую фигуру
+    }
+
+    //конец фигуры относительно всего экрана
+    public float getFigureFinish() {
+        return startPoint + (game.getVerticalPlace() + game.getFigure().getSizeY() + 1) * size + rect.width() / 4;
+        //последнее слагаемое это добавление размера вью под следующую фигуру
     }
 }
